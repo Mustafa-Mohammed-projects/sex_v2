@@ -1,0 +1,14 @@
+<a class="card" href="{{ item.get_absolute_url }}">
+  <div class="thumb">
+    {% if item.cover %}
+      <img src="{{ item.cover.url }}" alt="{{ item.title }}" loading="lazy">
+    {% else %}
+      <div class="ph">▶</div>
+    {% endif %}
+    {% if item.kind == 'video' %}<span class="badge">▶ فيديو</span>{% endif %}
+    <div class="overlay">
+      <h3>{{ item.title }}</h3>
+      <span>{{ item.created|date:"j F Y" }}</span>
+    </div>
+  </div>
+</a>

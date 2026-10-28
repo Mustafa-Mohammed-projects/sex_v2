@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+{% if featured %}
+<section class="hero" {% if featured.cover %}style="--bg:url('{{ featured.cover.url }}')"{% endif %}>
+  <div class="container hero-in">
+    <span class="chip-s">✦ مميّز</span>
+    <h1>{{ featured.title }}</h1>
+    {% if featured.description %}<p>{{ featured.description|truncatechars:140 }}</p>{% endif %}
+    <a class="btn" href="{{ featured.get_absolute_url }}">{% if featured.kind == 'video' %}شاهد الآن{% else %}عرض الصورة{% endif %}</a>
+  </div>
+</section>
+{% else %}
+<section class="intro container">
+  <h1>{{ SITE_NAME }}</h1>
+  <p>{{ SITE_TAGLINE }}</p>
+</section>
+{% endif %}
+
+<section class="container">
+  <form class="toolbar" method="get">
+    <div class="chips">
+      <a class="chip {% if not kind %}on{% endif %}" href="?{% if cat %}cat={{ cat }}{% endif %}">الكل</a>
+      <a class="chip {% if kind == 'photo' %}on{% endif %}" href="?kind=photo{% if cat %}&cat={{ cat }}{% endif %}">صور</a>
+      <a class="chip {% if kind == 'video' %}on{% endif %}" href="?kind=video{% if cat %}&cat={{ cat }}{% endif %}">فيديوهات</a>
+    </div>
+    <div class="search">
+      <input type="search" name="q" value="{{ q }}" placeholder="ابحث…">
+      {% if kind %}<input type="hidden" name="kind" value="{{ kind }}">{% endif %}
+      {% if cat %}<input type="hidden" name="cat" value="{{ cat }}">{% endif %}
+      <button class="btn sm" type="submit">بحث</button>
+    </div>
+  </form>
+
+  {% if categories %}
+  <div class="chips cats">
+    {% for c in categories %}
+    <a class="chip {% if cat == c.pk|stringformat:'s' %}on{% endif %}" href="?cat={{ c.pk }}{% if kind %}&kind={{ kind }}{% endif %}">{{ c.name }}</a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if page.object_list %}
+  <div class="grid">
+    {% for item in page %}{% include "gallery/_card.html" %}{% endfor %}
+  </div>
+
+  {% if page.paginator.num_pages > 1 %}
+  <nav class="pager">
+    {% if page.has_previous %}<a class="btn ghost" href="?{% if qs %}{{ qs }}&{% endif %}page={{ page.previous_page_number }}">→ السابق</a>{% endif %}
+    <span>{{ page.number }} / {{ page.paginator.num_pages }}</span>
+    {% if page.has_next %}<a class="btn ghost" href="?{% if qs %}{{ qs }}&{% endif %}page={{ page.next_page_number }}">التالي ←</a>{% endif %}
+  </nav>
+  {% endif %}
+  {% else %}
+  <div class="empty"><div>🗂️</div><p>لا توجد نتائج حاليًا.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

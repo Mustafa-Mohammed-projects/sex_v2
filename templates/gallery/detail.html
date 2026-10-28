@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ item.title }}{% endblock %}
+{% block desc %}{{ item.description|truncatechars:150|default:item.title }}{% endblock %}
+{% block og %}
+<meta property="og:title" content="{{ item.title }}">
+{% if item.cover %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ item.cover.url }}">{% endif %}
+{% endblock %}
+{% block content %}
+<article class="container detail">
+  <a class="back" href="{% url 'gallery:home' %}">→ العودة للمعرض</a>
+
+  <div class="stage">
+    {% if item.kind == 'photo' %}
+      <img src="{{ item.image.url }}" alt="{{ item.title }}" class="zoomable">
+    {% elif item.video_file %}
+      <video controls preload="metadata" {% if item.thumbnail %}poster="{{ item.thumbnail.url }}"{% endif %}>
+        <source src="{{ item.video_file.url }}">
+      </video>
+    {% elif item.youtube_embed %}
+      <div class="ratio"><iframe src="{{ item.youtube_embed }}" allowfullscreen loading="lazy"></iframe></div>
+    {% endif %}
+  </div>
+
+  <div class="meta">
+    <h1>{{ item.title }}</h1>
+    <div class="meta-row">
+      <span>📅 {{ item.created|date:"j F Y" }}</span>
+      <span>👁 {{ item.views }} مشاهدة</span>
+      {% if item.category %}<a class="chip" href="{% url 'gallery:home' %}?cat={{ item.category.pk }}">{{ item.category.name }}</a>{% endif %}
+      {% if item.kind == 'photo' %}<a class="btn sm ghost" href="{{ item.image.url }}" download>تحميل</a>{% endif %}
+      <button class="btn sm ghost" id="shareBtn" data-title="{{ item.title }}">مشاركة</button>
+    </div>
+    {% if item.description %}<p class="desc">{{ item.description|linebreaksbr }}</p>{% endif %}
+  </div>
+
+  {% if related %}
+  <h2 class="sec">قد يعجبك أيضًا</h2>
+  <div class="grid four">{% for item in related %}{% include "gallery/_card.html" %}{% endfor %}</div>
+  {% endif %}
+</article>
+{% endblock %}
